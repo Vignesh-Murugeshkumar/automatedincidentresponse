@@ -15,7 +15,8 @@ public class Incident {
     @Column(nullable = false)
     private String type;
 
-    @Column(nullable = false)
+    // 'user' is a reserved word in some databases (H2). Map to 'username' column name to avoid DDL errors.
+    @Column(name = "username", nullable = false)
     private String user;
 
     @Column(nullable = false)

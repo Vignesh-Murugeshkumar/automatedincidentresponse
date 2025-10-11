@@ -1,4 +1,4 @@
-package com.vignesh.incidentresponse;
+package com.team.incidentresponse;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

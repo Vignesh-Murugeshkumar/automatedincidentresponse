@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layout/base">
+<head>
+    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Dashboard</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-4">Incident Response Dashboard</h1>
+
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Incidents</h5>
+                                <h3 th:text="${totalIncidents}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">High Priority</h5>
+                                <h3 th:text="${highPriorityCount}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Active</h5>
+                                <h3 th:text="${activeCount}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Resolved</h5>
+                                <h3 th:text="${resolvedCount}">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Incidents Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Recent Incidents</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Type</th>
+                                        <th>User</th>
+                                        <th>Severity</th>
+                                        <th>Score</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${#lists.isEmpty(incidents)}">
+                                        <td colspan="7" class="text-center text-muted">
+                                            No incidents found
+                                        </td>
+                                    </tr>
+                                    <tr th:each="incident : ${incidents}"
+                                        th:replace="fragments/incident-row :: row(${incident})">
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

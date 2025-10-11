@@ -6,5 +6,7 @@ import com.team.incidentresponse.model.Incident;
 
 @Repository
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
-    // Custom queries can go here if needed
+    Incident findById(long id);
+    void deleteById(long id);
+    
 }

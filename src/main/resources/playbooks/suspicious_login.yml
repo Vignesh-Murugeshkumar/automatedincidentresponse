@@ -1,0 +1,10 @@
+incidentType: suspicious_login
+parameters:
+  geoLocation: "{{geoLocation}}"
+steps:
+  - action: checkGeoLocation
+  - if: geoLocation == "suspicious"
+    then:
+      - action: revokeToken
+      - action: notifyUser
+      - action: enforceMFA

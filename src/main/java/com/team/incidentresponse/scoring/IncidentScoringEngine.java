@@ -11,9 +11,9 @@ public class IncidentScoringEngine {
     private final double confidenceWeight = 0.2;
 
     public double calculateScore(Incident incident) {
-        int threatLevel = incident.getThreatLevel();           // e.g., 8
-        int assetValue = incident.getAssetValue();             // e.g., 9
-        double confidence = incident.getDetectionConfidence(); // e.g., 0.85
+        int threatLevel = incident.getThreatLevel();           
+        int assetValue = incident.getAssetValue();             
+        double confidence = incident.getDetectionConfidence(); 
 
         return (threatWeight * threatLevel) +
                (assetWeight * assetValue) +

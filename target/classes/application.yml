@@ -5,10 +5,12 @@ spring:
   application:
     name: automated-incident-response
   datasource:
-    url: jdbc:h2:mem:incidentdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    # By default the app uses an in-memory H2 database for development.
+    # To use MySQL, set the following environment variables (SPRING_DATASOURCE_URL/etc.)
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:incidentdb}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER:org.h2.Driver}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
   jpa:
     hibernate:
       ddl-auto: update

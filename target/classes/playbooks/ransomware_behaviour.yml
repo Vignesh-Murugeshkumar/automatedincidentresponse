@@ -1,0 +1,8 @@
+incidentType: ransomware_behavior
+parameters:
+  hostId: "{{hostId}}"
+steps:
+  - action: isolateHost
+  - action: snapshotDisk
+  - action: notifySOC
+  - action: logIncident
