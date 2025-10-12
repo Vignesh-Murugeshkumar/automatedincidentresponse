@@ -1,0 +1,26 @@
+incident:
+  type: phishing_email
+  description: "Phishing email detected targeting users."
+
+detection:
+  indicators:
+    - suspicious_subject: "Your account is compromised"
+    - suspicious_link: "http://malicious-site.com"
+    - attachment_type: ".exe"
+  conditions:
+    - "email.contains_link == true"
+    - "email.sender not in trusted_senders"
+    - "email.domain in blacklist_domains"
+
+response:
+  actions:
+    - notify_user: "Security team has detected a phishing attempt in your inbox."
+    - revoke_token: "Revoke user session tokens to prevent compromise."
+    - log_audit: "Record incident in audit logs."
+  - action: isolateEmail
+  - action: notifyUser  
+
+
+
+
+  

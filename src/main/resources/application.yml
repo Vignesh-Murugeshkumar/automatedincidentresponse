@@ -36,6 +36,11 @@ security:
   jwt:
     secret: changeme-super-secret-key
     expiration: 3600000 # 1 hour
+spring:
+  security:
+    user:
+      name: ${SPRING_SECURITY_USER_NAME:admin}
+      password: ${SPRING_SECURITY_USER_PASSWORD:admin123}
 
 playbook:
   path: classpath:playbooks/

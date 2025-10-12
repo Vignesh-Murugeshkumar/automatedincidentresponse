@@ -1,0 +1,7 @@
+incidentType: privilege_escalation
+parameters:
+  userId: "{{userId}}"
+steps:
+  - action: revokeAdminAccess
+  - action: notifySecurityTeam
+  - action: logAccessAttempt
