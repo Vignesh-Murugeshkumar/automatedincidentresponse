@@ -5,26 +5,38 @@ spring:
   application:
     name: automated-incident-response
   datasource:
-    url: jdbc:h2:mem:incidentdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: jdbc:postgresql://postgres:5432/incidentdb
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  mail:
+    host: imap.gmail.com
+    port: 993
+    username: vbvubuvbv@gmail.com
+    password: xizr cbgy mrrf lvnr
+    properties:
+      mail:
+        imap:
+          ssl:
+            enable: true
+            trust: imap.gmail.com
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
-  security:
-    user:
-      name: ${SPRING_SECURITY_USER_NAME:admin}
-      password: ${SPRING_SECURITY_USER_PASSWORD:admin123}
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 logging:
   level:
     root: INFO
     com.vignesh.incidentresponse: DEBUG
+
+security:
+  user:
+    name: ${SPRING_SECURITY_USER_NAME:admin}
+    password: ${SPRING_SECURITY_USER_PASSWORD:admin123}
 
 websocket:
   endpoint: /incident-feed
@@ -32,7 +44,7 @@ websocket:
 
 scheduler:
   enabled: true
-  incident-check-interval: 30000 # in milliseconds
+  incident-check-interval: 30000
 
 playbook:
   path: classpath:playbooks/
