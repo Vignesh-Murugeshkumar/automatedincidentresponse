@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: automatedincidentresponse
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://<HOST>:5432/<DATABASE>
+      - key: SPRING_DATASOURCE_USERNAME
+        value: incidentdb_user
+      - key: SPRING_DATASOURCE_PASSWORD
+        value: 0IMi4ANZ3FYG5Wlq30QhtfDlGv9RVYuJ
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: update
