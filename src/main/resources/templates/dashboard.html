@@ -7,79 +7,99 @@
 </head>
 <body>
     <div layout:fragment="content">
-        <div class="row">
-            <div class="col-12">
-                <h1 class="mb-4">Incident Response Dashboard</h1>
-
-                <!-- Statistics Cards -->
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card bg-primary text-white">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Incidents</h5>
-                                <h3 th:text="${totalIncidents}">0</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-danger text-white">
-                            <div class="card-body">
-                                <h5 class="card-title">High Priority</h5>
-                                <h3 th:text="${highPriorityCount}">0</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-warning text-white">
-                            <div class="card-body">
-                                <h5 class="card-title">Active</h5>
-                                <h3 th:text="${activeCount}">0</h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-success text-white">
-                            <div class="card-body">
-                                <h5 class="card-title">Resolved</h5>
-                                <h3 th:text="${resolvedCount}">0</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Incidents Table -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Recent Incidents</h5>
-                    </div>
+        <h1>Incident Response Dashboard</h1>
+        
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <div class="card bg-secondary text-light">
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Type</th>
-                                        <th>User</th>
-                                        <th>Severity</th>
-                                        <th>Score</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:if="${#lists.isEmpty(incidents)}">
-                                        <td colspan="7" class="text-center text-muted">
-                                            No incidents found
-                                        </td>
-                                    </tr>
-                                    <tr th:each="incident : ${incidents}"
-                                        th:replace="fragments/incident-row :: row(${incident})">
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <h5>Total Incidents</h5>
+                        <h2 th:text="${totalIncidents}">0</h2>
                     </div>
                 </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card bg-secondary text-light">
+                    <div class="card-body">
+                        <h5>Active</h5>
+                        <h2 th:text="${activeCount}">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card bg-secondary text-light">
+                    <div class="card-body">
+                        <h5>Resolved</h5>
+                        <h2 th:text="${resolvedCount}">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card bg-secondary text-light">
+                    <div class="card-body">
+                        <h5>Critical</h5>
+                        <h2 th:text="${criticalCount}">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card bg-secondary text-light">
+                    <div class="card-body">
+                        <h5>Trojans</h5>
+                        <h2 th:text="${trojanCount}">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card bg-secondary text-light">
+                    <div class="card-body">
+                        <h5>Last 24h</h5>
+                        <h2 th:text="${last24Hours}">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-secondary text-light">
+            <div class="card-header">
+                <h5>Recent Incidents</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-dark">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Type</th>
+                            <th>User</th>
+                            <th>Severity</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(incidents)}">
+                            <td colspan="6" class="text-center">No incidents found</td>
+                        </tr>
+                        <tr th:each="incident : ${incidents}">
+                            <td th:text="${incident.id}">1</td>
+                            <td th:text="${incident.type}">Type</td>
+                            <td th:text="${incident.user}">User</td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${incident.severity.name() == 'CRITICAL'} ? 'bg-danger' : 
+                                                     (${incident.severity.name() == 'HIGH'} ? 'bg-warning' : 
+                                                     (${incident.severity.name() == 'MEDIUM'} ? 'bg-info' : 'bg-secondary'))"
+                                      th:text="${incident.severity}">MEDIUM</span>
+                            </td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${incident.status.name() == 'RESOLVED'} ? 'bg-success' : 'bg-warning'"
+                                      th:text="${incident.status}">ACTIVE</span>
+                            </td>
+                            <td th:text="${#temporals.format(incident.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

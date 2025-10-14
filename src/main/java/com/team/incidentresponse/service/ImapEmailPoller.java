@@ -45,22 +45,47 @@ public class ImapEmailPoller {
     private void handleMessage(Message m) {
         try {
             String from = ((InternetAddress) m.getFrom()[0]).getAddress();
-            String subject = m.getSubject();
-            String body = m.getContent().toString();
+            String subject = m.getSubject() != null ? m.getSubject().toLowerCase() : "";
+            String body = m.getContent().toString().toLowerCase();
 
-            boolean suspect = false;
-            if (subject != null && subject.toLowerCase().contains("reset password")) suspect = true;
-            if (from.endsWith(".ru") || from.endsWith(".cn")) suspect = true;
+            String[] phishingKeywords = {"urgent", "verify account", "click here", "suspended", 
+                "confirm identity", "update payment", "security alert", "act now"};
+            
+            String[] suspiciousDomains = {".tk", ".ml", ".ga", ".cf", "tempmail", "guerrillamail"};
+            
+            boolean isPhishing = false;
+            String reason = "";
+            
+            // Check for phishing keywords
+            for (String keyword : phishingKeywords) {
+                if (subject.contains(keyword) || body.contains(keyword)) {
+                    isPhishing = true;
+                    reason = "Phishing keyword detected: " + keyword;
+                    break;
+                }
+            }
+            
+            // Check suspicious domains
+            for (String domain : suspiciousDomains) {
+                if (from.contains(domain)) {
+                    isPhishing = true;
+                    reason = "Suspicious domain: " + domain;
+                    break;
+                }
+            }
 
-            if (suspect) {
+            if (isPhishing) {
                 Incident incident = new Incident();
-                incident.setType("phishing_email");
-                incident.setSeverity(Incident.Severity.MEDIUM);
-                incident.setDescription("Potential phishing: " + subject + " from " + from);
-                incidentService.handleIncident(incident);
+                incident.setType("Phishing Email");
+                incident.setUser(from);
+                incident.setSeverity(Incident.Severity.HIGH);
+                incident.setScore(85);
+                incident.setDescription(reason + " - Subject: " + m.getSubject());
+                incidentService.createIncident(incident);
+                System.out.println("🚨 Phishing email detected from: " + from);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error processing email: " + e.getMessage());
         }
     }
 }

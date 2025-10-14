@@ -2,41 +2,46 @@ package com.team.incidentresponse.controller;
 
 import com.team.incidentresponse.model.Incident;
 import com.team.incidentresponse.service.IncidentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/incidents")
 public class IncidentController {
 
-    @Autowired
-    private IncidentService incidentService;
+    private final IncidentService incidentService;
 
-    // Report a new incident
-    @PostMapping("/report")
-    public ResponseEntity<String> reportIncident(@RequestBody Incident incident) {
-        incidentService.handleIncident(incident);
-        return ResponseEntity.ok("Incident received and processed.");
+    public IncidentController(IncidentService incidentService) {
+        this.incidentService = incidentService;
     }
 
-    // Get incident by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Incident> getIncident(@PathVariable Long id) {
-        Incident incident = incidentService.getIncidentById(id);
-        return ResponseEntity.ok(incident);
+    @PutMapping("/{id}/resolve")
+    public ResponseEntity<String> resolveIncident(@PathVariable Long id) {
+        try {
+            Incident incident = incidentService.findById(id);
+            if (incident != null) {
+                incident.setStatus(Incident.Status.RESOLVED);
+                incidentService.updateIncident(incident);
+                return ResponseEntity.ok("Incident resolved");
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to resolve incident");
+        }
     }
 
-    // List all incidents
-    @GetMapping("/all")
-    public ResponseEntity<List<Incident>> getAllIncidents() {
-        return ResponseEntity.ok(incidentService.getAllIncidents());
-    }
-    @PostMapping("/{id}/execute")
-    public ResponseEntity<String> executePlaybook(@PathVariable Long id) {
-        incidentService.executePlaybookForIncident(id);
-        return ResponseEntity.ok("Playbook manually triggered.");
+    @PutMapping("/{id}/dismiss")
+    public ResponseEntity<String> dismissIncident(@PathVariable Long id) {
+        try {
+            Incident incident = incidentService.findById(id);
+            if (incident != null) {
+                incident.setStatus(Incident.Status.DISMISSED);
+                incidentService.updateIncident(incident);
+                return ResponseEntity.ok("Incident dismissed");
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to dismiss incident");
+        }
     }
 }

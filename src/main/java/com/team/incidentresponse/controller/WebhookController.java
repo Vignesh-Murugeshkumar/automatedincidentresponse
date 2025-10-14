@@ -3,6 +3,9 @@ package com.team.incidentresponse.controller;
 import com.team.incidentresponse.model.Incident;
 import com.team.incidentresponse.service.IncidentService;
 import com.team.incidentresponse.responder.PlaybookExecutor;
+import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +17,8 @@ import java.util.Map;
 @RequestMapping("/api/webhook")
 public class WebhookController {
 
+    private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
+
     private final IncidentService incidentService;
     private final PlaybookExecutor playbookExecutor;
 
@@ -24,7 +29,8 @@ public class WebhookController {
     }
 
     @PostMapping
-    public ResponseEntity<String> handleWebhook(@RequestBody Map<String, Object> payload) {
+    public ResponseEntity<String> handleWebhook(@Valid @RequestBody Map<String, Object> payload) {
+        logger.info("Received webhook payload: {}", payload.keySet());
         try {
             // Extract fields from payload
             String type = (String) payload.getOrDefault("type", "Unknown");

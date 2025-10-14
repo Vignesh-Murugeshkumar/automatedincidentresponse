@@ -1,0 +1,9 @@
+name: "Trojan Detection Response"
+description: "Automated response for trojan/malware detection"
+trigger:
+  type: "Trojan Detection"
+actions:
+  - type: "notify_user"
+    message: "ALERT: Trojan detected on system. Immediate action required."
+  - type: "revoke_token" 
+    reason: "Security threat detected"

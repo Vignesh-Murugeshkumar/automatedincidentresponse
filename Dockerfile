@@ -1,30 +1,27 @@
-# ===== Stage 1: Build =====
-FROM maven:3.9.4-eclipse-temurin-21 AS build
+# ==========================
+# Stage 1: Build the JAR
+# ==========================
+FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
-# Set working directory inside container
 WORKDIR /app
 
-# Copy pom.xml and download dependencies first (caching)
+# Copy Maven files and build
 COPY pom.xml .
-RUN mvn dependency:go-offline
-
-# Copy the rest of the source code
 COPY src ./src
-
-# Build the app without running tests
 RUN mvn clean package -DskipTests
 
-# ===== Stage 2: Run =====
-FROM eclipse-temurin:21-jre
+# ==========================
+# Stage 2: Run the App
+# ==========================
+FROM eclipse-temurin:21-jdk-slim
 
-# Set working directory inside container
 WORKDIR /app
 
-# Copy the JAR built in Stage 1
-COPY --from=build /app/target/*.jar app.jar
+# Copy built JAR from builder stage
+COPY --from=builder /app/target/*.jar app.jar
 
-# Expose port
+# Expose Spring Boot default port
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java","-jar","app.jar"]
+# Run the JAR
+ENTRYPOINT ["java", "-jar", "app.jar"]

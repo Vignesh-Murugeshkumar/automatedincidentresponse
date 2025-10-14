@@ -1,6 +1,7 @@
 package com.team.incidentresponse.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -13,10 +14,14 @@ public class Incident {
     private Long id;
 
     @Column(nullable = false)
+    @NotBlank(message = "Incident type is required")
+    @Size(max = 100, message = "Type must be less than 100 characters")
     private String type;
 
     // 'user' is a reserved word in some databases (H2). Map to 'username' column name to avoid DDL errors.
     @Column(name = "username", nullable = false)
+    @NotBlank(message = "User is required")
+    @Size(max = 50, message = "User must be less than 50 characters")
     private String user;
 
     @Column(nullable = false)
@@ -42,6 +47,7 @@ public class Incident {
     private LocalDateTime updatedAt;
 
     @Column(length = 1000)
+    @Size(max = 1000, message = "Description must be less than 1000 characters")
     private String description;
 
     public Incident() {

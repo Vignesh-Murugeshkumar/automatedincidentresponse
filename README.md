@@ -9,7 +9,7 @@ A Spring Boot application for automated incident response and monitoring.
 - YAML-based playbook configuration
 - Responsive web dashboard
 - Security integration
-- Database persistence with H2
+- Database persistence with PostgreSQL
 
 ## Prerequisites
 
@@ -38,30 +38,65 @@ java -jar target/automated-incident-response-1.0.0.jar
 
 ## Configuration
 
-The application uses the following default configuration:
+The application uses PostgreSQL database:
 - Port: 8080
-- Database: H2 (in-memory)
+- Database: PostgreSQL
 - Templates: Thymeleaf
 - Static resources: CSS, JS
+- Security: Basic authentication (admin/admin123)
+- WebSocket: Real-time incident updates
 
 ## API Endpoints
 
-- `GET /` - Dashboard
+### Web Interface
+- `GET /dashboard` - Main dashboard
 - `GET /incidents` - Incidents list
-- WebSocket: `/ws` - Real-time updates
+- WebSocket: `/incident-feed` - Real-time updates
+
+### REST API
+- `POST /api/webhook` - Create incident from webhook
+- `POST /api/web/webhook` - Alternative webhook endpoint
+- `GET /api/webhook/test` - Test webhook endpoint
+- `GET /api/web/test` - Test web endpoint
+
+
 
 ## Project Structure
 
 ```
 src/
 ├── main/
-│   ├── java/com/vignesh/incidentresponse/
+│   ├── java/com/team/incidentresponse/
 │   │   ├── AutomatedIncidentResponseApplication.java
-│   │   ├── Incident.java
-│   │   ├── IncidentController.java
-│   │   ├── IncidentService.java
-│   │   ├── IncidentRepository.java
-│   │   └── ... (other components)
+│   │   ├── config/
+│   │   │   ├── SchedulerConfig.java
+│   │   │   ├── SecurityConfig.java
+│   │   │   └── WebSocketConfig.java
+│   │   ├── controller/
+│   │   │   ├── DashboardController.java
+│   │   │   ├── IncidentController.java
+│   │   │   ├── WebController.java
+│   │   │   └── WebhookController.java
+│   │   ├── model/
+│   │   │   └── Incident.java
+│   │   ├── repository/
+│   │   │   └── IncidentRepository.java
+│   │   ├── service/
+│   │   │   ├── IncidentService.java
+│   │   │   ├── FileMonitorService.java
+│   │   │   ├── ImapEmailPoller.java
+│   │   │   └── AuditLogger.java
+│   │   ├── responder/
+│   │   │   ├── PlaybookExecutor.java
+│   │   │   ├── NotifyUserAction.java
+│   │   │   ├── ResponderAction.java
+│   │   │   └── RevokeTokenAction.java
+│   │   ├── scoring/
+│   │   │   └── IncidentScoringEngine.java
+│   │   └── util/
+│   │       ├── YamlPlaybookLoader.java
+│   │       ├── ParameterInjector.java
+│   │       └── AuditHashUtil.java
 │   └── resources/
 │       ├── templates/
 │       │   ├── dashboard.html
@@ -70,10 +105,12 @@ src/
 │       ├── static/
 │       │   ├── css/style.css
 │       │   └── js/dashboard.js
-│       └── playbooks/
-│           ├── suspicious_login.yml
-│           ├── ransomware_behaviour.yml
-│           └── ...
+│       ├── playbooks/
+│       │   ├── suspicious_login.yml
+│       │   ├── ransomware_behaviour.yml
+│       │   ├── phishing_email.yml
+│       │   └── Privilege_escalation.yml
+│       └── application.yml
 └── test/
     └── java/
 ```
@@ -81,18 +118,20 @@ src/
 ## Recent Fixes Applied
 
 ✅ **Fixed Issues:**
-1. Created missing main Spring Boot application class
-2. Added comprehensive pom.xml with all dependencies
-3. Created missing Thymeleaf templates (base.html, dashboard.html, incident-row.html)
-4. Created missing JPA entity (Incident.java)
-5. Fixed project structure and package declarations
+1. Fixed Thymeleaf template expression evaluation errors
+2. Corrected enum comparisons in controllers (Status and Severity)
+3. Updated package structure from com.vignesh to com.team.incidentresponse
+4. Configured PostgreSQL database support
+5. Fixed getStatus() method to return Status enum instead of String
+6. Resolved compilation errors in DashboardController
+7. Added comprehensive project structure with all components
 
 ## Testing
 
 The application includes:
 - Unit tests with JUnit 5
 - Spring Boot Test integration
-- H2 in-memory database for testing
+- PostgreSQL database for testing
 
 Run tests with:
 ```bash
@@ -121,32 +160,29 @@ If `java -version` doesn't show `21`, point `JAVA_HOME` to a JDK 21 installation
 
 The application is configured for development with:
 
-## Using MySQL instead of H2 (optional)
+## Database Setup
 
-If you'd like to run the application against a MySQL database so data persists across restarts, follow these steps:
+The application uses PostgreSQL as the database:
 
-1. Install and start MySQL (or use a managed MySQL instance).
-2. Create a database and user, for example (run in MySQL shell):
+1. Install and start PostgreSQL (or use a managed PostgreSQL instance).
+2. Create a database and user:
 
 ```sql
 CREATE DATABASE incidentdb;
-CREATE USER 'incidentuser'@'localhost' IDENTIFIED BY 'strongpassword';
-GRANT ALL PRIVILEGES ON incidentdb.* TO 'incidentuser'@'localhost';
-FLUSH PRIVILEGES;
+CREATE USER incidentdb_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE incidentdb TO incidentdb_user;
 ```
 
-3. Set environment variables before starting the app (PowerShell example):
+3. Update database credentials in `src/main/resources/application.yml`:
 
-```powershell
-$env:SPRING_DATASOURCE_URL = 'jdbc:mysql://localhost:3306/incidentdb?useSSL=false&serverTimezone=UTC'
-$env:SPRING_DATASOURCE_USERNAME = 'incidentuser'
-$env:SPRING_DATASOURCE_PASSWORD = 'strongpassword'
-$env:SPRING_DATASOURCE_DRIVER = 'com.mysql.cj.jdbc.Driver'
-mvn -DskipTests spring-boot:run
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/incidentdb
+    username: incidentdb_user
+    password: your_password
 ```
-
-4. The `mysql-connector-java` dependency is already present in `pom.xml`. Spring Boot will pick up the environment variables and connect to MySQL.
 
 Notes:
-- For production, tune connection pool settings and avoid `spring.jpa.hibernate.ddl-auto: update` (consider migrations via Flyway/Liquibase).
-- If you prefer a file-backed H2 database instead, set `SPRING_DATASOURCE_URL=jdbc:h2:file:./data/incidentdb`.
+- For production, use environment variables for credentials
+- Consider using connection pooling and migrations via Flyway/Liquibase
