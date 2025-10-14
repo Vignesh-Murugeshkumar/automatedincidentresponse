@@ -23,5 +23,5 @@ COPY --from=builder /app/target/*.jar app.jar
 # Expose Spring Boot default port
 EXPOSE 8080
 
-# Run the JAR
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the JAR with debug info
+ENTRYPOINT ["sh", "-c", "echo 'DATABASE_URL=' $DATABASE_URL && java -jar app.jar"]
