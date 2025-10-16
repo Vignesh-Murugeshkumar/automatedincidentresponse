@@ -3,103 +3,196 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="layout/base">
 <head>
-    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">Dashboard</title>
+    <title layout:title-pattern="$LAYOUT_TITLE - $CONTENT_TITLE">CyberShield Dashboard</title>
 </head>
 <body>
     <div layout:fragment="content">
-        <h1>Incident Response Dashboard</h1>
-        
-        <div class="row mb-4">
-            <div class="col-md-2">
-                <div class="card bg-secondary text-light">
-                    <div class="card-body">
-                        <h5>Total Incidents</h5>
-                        <h2 th:text="${totalIncidents}">0</h2>
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-bg"></div>
+            <div class="hero-card">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <div class="hero-status">
+                            <div class="status-dot"></div>
+                            <span class="status-text">System Online</span>
+                        </div>
+                        <h1 class="hero-title">Threat Intelligence Center</h1>
+                        <p class="hero-subtitle">Advanced AI-powered security monitoring and automated incident response system</p>
+
                     </div>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="card bg-secondary text-light">
-                    <div class="card-body">
-                        <h5>Active</h5>
-                        <h2 th:text="${activeCount}">0</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="card bg-secondary text-light">
-                    <div class="card-body">
-                        <h5>Resolved</h5>
-                        <h2 th:text="${resolvedCount}">0</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="card bg-secondary text-light">
-                    <div class="card-body">
-                        <h5>Critical</h5>
-                        <h2 th:text="${criticalCount}">0</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="card bg-secondary text-light">
-                    <div class="card-body">
-                        <h5>Trojans</h5>
-                        <h2 th:text="${trojanCount}">0</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="card bg-secondary text-light">
-                    <div class="card-body">
-                        <h5>Last 24h</h5>
-                        <h2 th:text="${last24Hours}">0</h2>
+                    <div class="hero-icon">
+                        <span>🛡️</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="card bg-secondary text-light">
-            <div class="card-header">
-                <h5>Recent Incidents</h5>
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card purple">
+                <div class="stat-header">
+                    <div class="stat-icon purple">
+                        <span>📊</span>
+                    </div>
+                    <div class="stat-indicator purple"></div>
+                </div>
+                <div class="stat-value" th:text="${totalIncidents}">0</div>
+                <div class="stat-label purple">Total Incidents</div>
+                <div class="stat-trend purple">
+                    <span>↑</span> +12% from last week
+                </div>
             </div>
-            <div class="card-body">
-                <table class="table table-dark">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Type</th>
-                            <th>User</th>
-                            <th>Severity</th>
-                            <th>Status</th>
-                            <th>Created</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:if="${#lists.isEmpty(incidents)}">
-                            <td colspan="6" class="text-center">No incidents found</td>
-                        </tr>
-                        <tr th:each="incident : ${incidents}">
-                            <td th:text="${incident.id}">1</td>
-                            <td th:text="${incident.type}">Type</td>
-                            <td th:text="${incident.user}">User</td>
-                            <td>
-                                <span class="badge" 
-                                      th:classappend="${incident.severity.name() == 'CRITICAL'} ? 'bg-danger' : 
-                                                     (${incident.severity.name() == 'HIGH'} ? 'bg-warning' : 
-                                                     (${incident.severity.name() == 'MEDIUM'} ? 'bg-info' : 'bg-secondary'))"
-                                      th:text="${incident.severity}">MEDIUM</span>
-                            </td>
-                            <td>
-                                <span class="badge" 
-                                      th:classappend="${incident.status.name() == 'RESOLVED'} ? 'bg-success' : 'bg-warning'"
-                                      th:text="${incident.status}">ACTIVE</span>
-                            </td>
-                            <td th:text="${#temporals.format(incident.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01 12:00</td>
-                        </tr>
-                    </tbody>
-                </table>
+            
+            <div class="stat-card blue">
+                <div class="stat-header">
+                    <div class="stat-icon blue">
+                        <span>⚡</span>
+                    </div>
+                    <div class="stat-indicator blue"></div>
+                </div>
+                <div class="stat-value" th:text="${activeCount}">0</div>
+                <div class="stat-label blue">Active Threats</div>
+                <div class="stat-trend blue">
+                    <span>⚠</span> Requires attention
+                </div>
+            </div>
+            
+            <div class="stat-card green">
+                <div class="stat-header">
+                    <div class="stat-icon green">
+                        <span>✓</span>
+                    </div>
+                    <div class="stat-indicator green"></div>
+                </div>
+                <div class="stat-value" th:text="${resolvedCount}">0</div>
+                <div class="stat-label green">Resolved</div>
+                <div class="stat-trend green">
+                    <span>✓</span> All clear
+                </div>
+            </div>
+            
+            <div class="stat-card red">
+                <div class="stat-header">
+                    <div class="stat-icon red">
+                        <span>🔥</span>
+                    </div>
+                    <div class="stat-indicator red"></div>
+                </div>
+                <div class="stat-value" th:text="${criticalCount}">0</div>
+                <div class="stat-label red">Critical</div>
+                <div class="stat-trend red">
+                    <span>🔥</span> High priority
+                </div>
+            </div>
+            
+            <div class="stat-card orange">
+                <div class="stat-header">
+                    <div class="stat-icon orange">
+                        <span>🐛</span>
+                    </div>
+                    <div class="stat-indicator orange"></div>
+                </div>
+                <div class="stat-value" th:text="${trojanCount}">0</div>
+                <div class="stat-label orange">Malware</div>
+                <div class="stat-trend orange">
+                    <span>🐛</span> Detected
+                </div>
+            </div>
+            
+            <div class="stat-card cyan">
+                <div class="stat-header">
+                    <div class="stat-icon cyan">
+                        <span>🕰️</span>
+                    </div>
+                    <div class="stat-indicator cyan"></div>
+                </div>
+                <div class="stat-value" th:text="${last24Hours}">0</div>
+                <div class="stat-label cyan">Last 24h</div>
+                <div class="stat-trend cyan">
+                    <span>🕰️</span> Recent activity
+                </div>
+            </div>
+        </div>
+
+        <!-- Incidents Table -->
+        <div class="incidents-section">
+            <div class="incidents-bg"></div>
+            <div class="incidents-card">
+                <div class="incidents-header">
+                    <div class="incidents-header-content">
+                        <div class="incidents-title-group">
+                            <div class="incidents-icon">
+                                <span>📋</span>
+                            </div>
+                            <div>
+                                <h2 class="incidents-title">Incident Timeline</h2>
+                                <p class="incidents-subtitle">Real-time security event monitoring</p>
+                            </div>
+                        </div>
+                        <div class="incidents-controls">
+                            <div class="live-indicator">
+                                <div class="live-dot"></div>
+                                <span class="live-text">Live Feed</span>
+                            </div>
+                            <button class="refresh-btn">
+                                🔄 Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Threat Type</th>
+                                <th>Target</th>
+                                <th>Risk Level</th>
+                                <th>Status</th>
+                                <th>Detected</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(incidents)}">
+                                <td colspan="6">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">
+                                            <span>🛡️</span>
+                                        </div>
+                                        <div class="empty-title">All Systems Secure</div>
+                                        <div class="empty-subtitle">No active threats detected</div>
+                                        <div class="empty-description">Your network is protected</div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="incident : ${incidents}">
+                                <td>
+                                    <strong th:text="${incident.id}">001</strong>
+                                </td>
+                                <td>
+                                    <span>🐛</span>
+                                    <span th:text="${incident.type}">Malware</span>
+                                </td>
+                                <td th:text="${incident.user}">system.user</td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${incident.severity.name() == 'CRITICAL'} ? 'critical' : 
+                                                         (${incident.severity.name() == 'HIGH'} ? 'high' : 
+                                                         (${incident.severity.name() == 'MEDIUM'} ? 'medium' : 'low'))"
+                                          th:text="${incident.severity}">MEDIUM</span>
+                                </td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${incident.status.name() == 'RESOLVED'} ? 'resolved' : 'active'"
+                                          th:text="${incident.status}">ACTIVE</span>
+                                </td>
+                                <td th:text="${#temporals.format(incident.createdAt, 'MMM dd, HH:mm')}">Oct 15, 14:30</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

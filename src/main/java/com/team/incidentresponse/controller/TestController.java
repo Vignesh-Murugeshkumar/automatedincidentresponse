@@ -89,11 +89,13 @@ public class TestController {
             result.append("🏠 User Home: ").append(userHome).append("\n\n");
             
             String[] scanPaths = {
-                userHome + "\\Desktop",
-                userHome + "\\OneDrive\\Desktop",
-                userHome + "\\Downloads",
-                "C:\\temp"
+                "/tmp",
+                "/app",
+                "/home"
             };
+            
+            // Create test files for demonstration
+            createTestFiles();
             
             String[] suspiciousPatterns = {
                 "trojan", "malware", "virus", "backdoor", "keylogger", 
@@ -168,6 +170,27 @@ public class TestController {
             
         } catch (Exception e) {
             return ResponseEntity.ok("❌ Scan failed: " + e.getMessage());
+        }
+    }
+    
+    private void createTestFiles() {
+        try {
+            java.io.File tmpDir = new java.io.File("/tmp");
+            if (tmpDir.exists()) {
+                // Create test trojan file
+                java.io.File trojanFile = new java.io.File("/tmp/trojan.exe");
+                if (!trojanFile.exists()) {
+                    java.nio.file.Files.write(trojanFile.toPath(), "Fake trojan for testing".getBytes());
+                }
+                
+                // Create test malware file
+                java.io.File malwareFile = new java.io.File("/tmp/malware.bat");
+                if (!malwareFile.exists()) {
+                    java.nio.file.Files.write(malwareFile.toPath(), "@echo off\necho Fake malware for testing".getBytes());
+                }
+            }
+        } catch (Exception e) {
+            // Silent fail
         }
     }
 

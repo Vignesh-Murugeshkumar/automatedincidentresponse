@@ -1,38 +1,61 @@
 package com.team.incidentresponse.controller;
 
 import com.team.incidentresponse.repository.IncidentRepository;
-import com.team.incidentresponse.service.AnalyticsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
 public class DashboardController {
 
     private final IncidentRepository incidentRepository;
-    private final AnalyticsService analyticsService;
 
-    public DashboardController(IncidentRepository incidentRepository, AnalyticsService analyticsService) {
+    public DashboardController(IncidentRepository incidentRepository) {
         this.incidentRepository = incidentRepository;
-        this.analyticsService = analyticsService;
+    }
+
+    @GetMapping("/")
+    public String index(Model model) {
+        long totalIncidents = incidentRepository.count();
+        model.addAttribute("totalIncidents", totalIncidents);
+        model.addAttribute("activeCount", incidentRepository.countByStatus(com.team.incidentresponse.model.Incident.Status.ACTIVE));
+        model.addAttribute("resolvedCount", incidentRepository.countByStatus(com.team.incidentresponse.model.Incident.Status.RESOLVED));
+        model.addAttribute("criticalCount", incidentRepository.countBySeverity(com.team.incidentresponse.model.Incident.Severity.CRITICAL));
+        model.addAttribute("recentIncidents", incidentRepository.findAll());
+        model.addAttribute("title", "Dashboard");
+        return "index";
     }
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
-        Map<String, Object> metrics = analyticsService.getDashboardMetrics();
-        model.addAllAttributes(metrics);
-        model.addAttribute("incidents", incidentRepository.findTop10ByOrderByCreatedAtDesc());
-        model.addAttribute("incidentsByType", analyticsService.getIncidentsByType());
-
-        return "dashboard";
+        return "redirect:/";
     }
 
-    @GetMapping("/api/dashboard/metrics")
+    @GetMapping("/incidents")
+    public String incidents(Model model) {
+        model.addAttribute("incidents", incidentRepository.findAll());
+        model.addAttribute("title", "Incidents");
+        return "incidents";
+    }
+
+    @GetMapping("/analytics")
+    public String analytics(Model model) {
+        model.addAttribute("title", "Analytics");
+        return "analytics";
+    }
+
+    @GetMapping("/api/dashboard/stats")
     @ResponseBody
-    public Map<String, Object> getDashboardMetrics() {
-        return analyticsService.getDashboardMetrics();
+    public Map<String, Object> getDashboardStats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalIncidents", incidentRepository.count());
+        stats.put("activeCount", incidentRepository.countByStatus(com.team.incidentresponse.model.Incident.Status.ACTIVE));
+        stats.put("resolvedCount", incidentRepository.countByStatus(com.team.incidentresponse.model.Incident.Status.RESOLVED));
+        stats.put("criticalCount", incidentRepository.countBySeverity(com.team.incidentresponse.model.Incident.Severity.CRITICAL));
+        return stats;
     }
 }

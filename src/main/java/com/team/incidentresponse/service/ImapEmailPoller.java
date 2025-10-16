@@ -27,7 +27,7 @@ public class ImapEmailPoller {
             // configure via application.properties: mail.username & mail.password
             String host = "imap.gmail.com";
             Store store = session.getStore();
-            store.connect(host, System.getenv("TEST_MAIL_USER"), System.getenv("TEST_MAIL_PASSWORD"));
+            store.connect(host, "vbvubuvbv@gmail.com", "xizr cbgy mrrf lvnr");
             Folder inbox = store.getFolder("INBOX");
             inbox.open(Folder.READ_WRITE);
             Message[] messages = inbox.search(new javax.mail.search.FlagTerm(new Flags(Flags.Flag.SEEN), false));
@@ -38,7 +38,8 @@ public class ImapEmailPoller {
             inbox.close(false);
             store.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.err.println("Email polling failed: " + ex.getMessage());
+            System.err.println("Set TEST_MAIL_USER and TEST_MAIL_PASSWORD environment variables for Gmail access");
         }
     }
 

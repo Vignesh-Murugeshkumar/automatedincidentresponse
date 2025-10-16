@@ -5,7 +5,9 @@ spring:
   application:
     name: automated-incident-response
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/incidentdb}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/incidentdb}
+    username: ${SPRING_DATASOURCE_USERNAME:incidentdb_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:vicky2104}
     driver-class-name: org.postgresql.Driver
   mail:
     host: imap.gmail.com

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head">
+    <title>Analytics - Automated Incident Response</title>
+</head>
+<body>
+    <nav th:replace="fragments/header :: navbar"></nav>
+    
+    <div class="container-fluid py-4">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-chart-bar me-2"></i>Security Analytics
+            </h1>
+            <div>
+                <select class="form-select d-inline-block w-auto me-2" id="timeRange" onchange="updateCharts()">
+                    <option value="7">Last 7 Days</option>
+                    <option value="30" selected>Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                </select>
+                <button class="btn btn-primary" onclick="refreshAnalytics()">
+                    <i class="fas fa-sync-alt me-1"></i>Refresh
+                </button>
+            </div>
+        </div>
+        
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Avg Response Time</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">2.4 min</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-clock fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Resolution Rate</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">94.2%</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-percentage fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">False Positives</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">5.8%</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Threat Score</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">Medium</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-shield-alt fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row 1 -->
+        <div class="row mb-4">
+            <div class="col-xl-8 col-lg-7">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-chart-line me-2"></i>Incidents Trend (Last 30 Days)
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="trendChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-4 col-lg-5">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-chart-pie me-2"></i>Incident Types
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="typesChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row 2 -->
+        <div class="row mb-4">
+            <div class="col-xl-6 col-lg-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-chart-bar me-2"></i>Severity Distribution
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="severityAnalyticsChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-xl-6 col-lg-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-clock me-2"></i>Response Time Analysis
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="responseTimeChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Threats Table -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-list-ol me-2"></i>Top Threat Sources
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Source/Type</th>
+                                <th>Incidents</th>
+                                <th>Avg Severity</th>
+                                <th>Last Seen</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge bg-warning">1</span></td>
+                                <td>
+                                    <i class="fas fa-envelope text-warning me-1"></i>
+                                    Phishing Emails
+                                </td>
+                                <td><strong>12</strong></td>
+                                <td><span class="badge bg-warning">HIGH</span></td>
+                                <td>2 hours ago</td>
+                                <td><i class="fas fa-arrow-up text-danger"></i> +15%</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-secondary">2</span></td>
+                                <td>
+                                    <i class="fas fa-bug text-danger me-1"></i>
+                                    Malware Detection
+                                </td>
+                                <td><strong>8</strong></td>
+                                <td><span class="badge bg-danger">CRITICAL</span></td>
+                                <td>5 hours ago</td>
+                                <td><i class="fas fa-arrow-down text-success"></i> -8%</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge bg-secondary">3</span></td>
+                                <td>
+                                    <i class="fas fa-user-secret text-info me-1"></i>
+                                    Suspicious Login
+                                </td>
+                                <td><strong>6</strong></td>
+                                <td><span class="badge bg-info">MEDIUM</span></td>
+                                <td>1 day ago</td>
+                                <td><i class="fas fa-minus text-muted"></i> 0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/footer :: footer"></footer>
+    <div th:replace="fragments/footer :: scripts"></div>
+    
+    <script>
+        // Initialize analytics charts when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAnalyticsCharts();
+        });
+    </script>
+</body>
+</html>

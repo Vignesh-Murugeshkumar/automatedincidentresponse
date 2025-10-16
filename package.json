@@ -1,0 +1,11 @@
+{
+  "name": "automated-incident-response",
+  "version": "1.0.0",
+  "description": "Automated Incident Response System",
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/main/resources/static/css/input.css -o ./src/main/resources/static/css/style.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.5"
+  }
+}

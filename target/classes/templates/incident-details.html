@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: head">
+    <title>Incident Details - Automated Incident Response</title>
+</head>
+<body>
+    <nav th:replace="fragments/header :: navbar"></nav>
+    
+    <div class="container-fluid py-4">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-file-alt me-2"></i>Incident Details
+                <span class="badge bg-primary ms-2" th:text="'#' + ${incident.id}">#001</span>
+            </h1>
+            <div>
+                <a th:href="@{/incidents}" class="btn btn-secondary me-2">
+                    <i class="fas fa-arrow-left me-1"></i>Back to List
+                </a>
+                <button class="btn btn-success me-1" 
+                        th:if="${incident.status.name() == 'ACTIVE'}"
+                        th:onclick="'resolveIncident(' + ${incident.id} + ')'">
+                    <i class="fas fa-check me-1"></i>Resolve
+                </button>
+                <button class="btn btn-warning" 
+                        th:if="${incident.status.name() == 'ACTIVE'}"
+                        th:onclick="'dismissIncident(' + ${incident.id} + ')'">
+                    <i class="fas fa-times me-1"></i>Dismiss
+                </button>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Main Details -->
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-info-circle me-2"></i>Incident Information
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-3"><strong>Type:</strong></div>
+                            <div class="col-sm-9">
+                                <i class="fas fa-bug text-danger me-1" th:if="${incident.type == 'Malware'}"></i>
+                                <i class="fas fa-envelope text-warning me-1" th:if="${incident.type == 'Phishing Email'}"></i>
+                                <i class="fas fa-user-secret text-info me-1" th:if="${incident.type == 'Suspicious Login'}"></i>
+                                <span th:text="${incident.type}">Malware Detection</span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-3"><strong>Target/User:</strong></div>
+                            <div class="col-sm-9">
+                                <code th:text="${incident.user}">system.user</code>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-3"><strong>Description:</strong></div>
+                            <div class="col-sm-9">
+                                <p th:text="${incident.description}" class="mb-0">
+                                    Suspicious file detected with malware signature. File has been quarantined and system scan initiated.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-sm-3"><strong>Created:</strong></div>
+                            <div class="col-sm-9">
+                                <i class="fas fa-clock me-1"></i>
+                                <span th:text="${#temporals.format(incident.createdAt, 'EEEE, MMMM dd, yyyy \'at\' HH:mm:ss')}">
+                                    Monday, October 15, 2024 at 14:30:25
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3" th:if="${incident.resolvedAt}">
+                            <div class="col-sm-3"><strong>Resolved:</strong></div>
+                            <div class="col-sm-9">
+                                <i class="fas fa-check-circle text-success me-1"></i>
+                                <span th:text="${#temporals.format(incident.resolvedAt, 'EEEE, MMMM dd, yyyy \'at\' HH:mm:ss')}">
+                                    Monday, October 15, 2024 at 15:45:10
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timeline -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-history me-2"></i>Incident Timeline
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title">Incident Created</h6>
+                                    <p class="timeline-text">Initial detection and incident creation</p>
+                                    <small class="text-muted" th:text="${#temporals.format(incident.createdAt, 'MMM dd, yyyy HH:mm')}">Oct 15, 2024 14:30</small>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item" th:if="${incident.status.name() != 'ACTIVE'}">
+                                <div class="timeline-marker" th:classappend="${incident.status.name() == 'RESOLVED'} ? 'bg-success' : 'bg-secondary'"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title" th:text="${incident.status.name() == 'RESOLVED'} ? 'Incident Resolved' : 'Incident Dismissed'">Incident Resolved</h6>
+                                    <p class="timeline-text" th:text="${incident.status.name() == 'RESOLVED'} ? 'Issue has been successfully resolved' : 'Incident has been dismissed'">Issue has been successfully resolved</p>
+                                    <small class="text-muted" th:text="${incident.resolvedAt != null} ? ${#temporals.format(incident.resolvedAt, 'MMM dd, yyyy HH:mm')} : 'Just now'">Oct 15, 2024 15:45</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Status Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-tachometer-alt me-2"></i>Status & Metrics
+                        </h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <span class="badge fs-5 px-3 py-2" 
+                                  th:classappend="${incident.status.name() == 'RESOLVED'} ? 'bg-success' : 
+                                                 (${incident.status.name() == 'DISMISSED'} ? 'bg-secondary' : 'bg-primary')"
+                                  th:text="${incident.status}">ACTIVE</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Severity Level</strong></label>
+                            <div>
+                                <span class="badge fs-6 px-3 py-2" 
+                                      th:classappend="${incident.severity.name() == 'CRITICAL'} ? 'bg-danger' : 
+                                                     (${incident.severity.name() == 'HIGH'} ? 'bg-warning text-dark' : 
+                                                     (${incident.severity.name() == 'MEDIUM'} ? 'bg-info' : 'bg-secondary'))"
+                                      th:text="${incident.severity}">HIGH</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label"><strong>Risk Score</strong></label>
+                            <div class="progress mb-2" style="height: 25px;">
+                                <div class="progress-bar fs-6" 
+                                     th:classappend="${incident.score >= 80} ? 'bg-danger' : 
+                                                    (${incident.score >= 60} ? 'bg-warning' : 'bg-success')"
+                                     th:style="'width: ' + ${incident.score} + '%'"
+                                     th:text="${incident.score} + '%'">85%</div>
+                            </div>
+                            <small class="text-muted">
+                                <span th:if="${incident.score >= 80}">High Risk - Immediate Action Required</span>
+                                <span th:if="${incident.score >= 60 && incident.score < 80}">Medium Risk - Monitor Closely</span>
+                                <span th:if="${incident.score < 60}">Low Risk - Routine Monitoring</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Actions Card -->
+                <div class="card shadow mb-4" th:if="${incident.status.name() == 'ACTIVE'}">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-cogs me-2"></i>Quick Actions
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" th:onclick="'resolveIncident(' + ${incident.id} + ')'">
+                                <i class="fas fa-check me-2"></i>Mark as Resolved
+                            </button>
+                            <button class="btn btn-warning" th:onclick="'dismissIncident(' + ${incident.id} + ')'">
+                                <i class="fas fa-times me-2"></i>Dismiss Incident
+                            </button>
+                            <button class="btn btn-info" onclick="exportIncident()">
+                                <i class="fas fa-download me-2"></i>Export Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Related Incidents -->
+                <div class="card shadow mb-4" th:if="${relatedIncidents && !#lists.isEmpty(relatedIncidents)}">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-link me-2"></i>Related Incidents
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div th:each="related : ${relatedIncidents}" class="mb-2">
+                            <a th:href="@{/incidents/{id}(id=${related.id})}" class="text-decoration-none">
+                                <small class="text-muted">#<span th:text="${related.id}">002</span></small><br>
+                                <span th:text="${related.type}">Similar Incident</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/footer :: footer"></footer>
+    <div th:replace="fragments/footer :: scripts"></div>
+</body>
+</html>

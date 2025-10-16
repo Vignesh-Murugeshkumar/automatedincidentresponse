@@ -15,7 +15,7 @@ public class IncidentController {
         this.incidentService = incidentService;
     }
 
-    @PutMapping("/{id}/resolve")
+    @PostMapping("/{id}/resolve")
     public ResponseEntity<String> resolveIncident(@PathVariable Long id) {
         try {
             Incident incident = incidentService.findById(id);
@@ -30,7 +30,7 @@ public class IncidentController {
         }
     }
 
-    @PutMapping("/{id}/dismiss")
+    @PostMapping("/{id}/dismiss")
     public ResponseEntity<String> dismissIncident(@PathVariable Long id) {
         try {
             Incident incident = incidentService.findById(id);
