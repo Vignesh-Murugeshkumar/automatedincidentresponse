@@ -27,7 +27,7 @@ public class ImapEmailPoller {
             // configure via application.properties: mail.username & mail.password
             String host = "imap.gmail.com";
             Store store = session.getStore();
-            store.connect(host, "vbvubuvbv@gmail.com", "xizr cbgy mrrf lvnr");
+            store.connect(host, "your mail", "your app password");
             Folder inbox = store.getFolder("INBOX");
             inbox.open(Folder.READ_WRITE);
             Message[] messages = inbox.search(new javax.mail.search.FlagTerm(new Flags(Flags.Flag.SEEN), false));
